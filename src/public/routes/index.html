@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        <script src="./js/main.js"></script>
+        
+        <title>NutriTrack</title>
+    </head>
+    <body class="h-screen w-screen bg-white flex text-black overflow-clip">
+        <nav class="w-1/5 bg-gray-100 flex flex-col items-center p-5 space-y-5">
+            <a onclick="loadPage('/dashboard')" class="hover:text-yellow-700">home</a>
+            <a onclick="loadPage('/dashboard')" class="hover:text-yellow-700">meals</a>
+        </nav>
+        <main id="app" class="w-4/5"></main>
+    </body>
+</html>
