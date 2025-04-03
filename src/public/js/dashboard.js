@@ -10,7 +10,6 @@ async function getStats() {
     });
 
     const objective = await requestObj.json();
-    console.log(objective);
 
     const requestMeals = await fetch('/api/meals', {
         method: 'GET',

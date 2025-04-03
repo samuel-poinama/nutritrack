@@ -13,7 +13,6 @@ async function register() {
         body: JSON.stringify(data),
     });
 
-    console.log(request);
     const response = await request.json();
 
     if (request.status === 201) {

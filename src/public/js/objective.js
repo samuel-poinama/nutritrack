@@ -14,7 +14,6 @@ async function getObjective() {
     if (request.status === 200) {
         const response = await request.json();
         document.getElementById('calories').value = response.calories;
-        console.log(token);
         document.getElementById('fat').value = response.fat;
         document.getElementById('proteins').value = response.protein;
     }
@@ -26,7 +25,6 @@ async function getObjective() {
 getObjective();
 
 async function setObjective() {
-    console.log('setObjective called');
     const token = localStorage.getItem('token');
 
     const calories = document.getElementById('calories').value;
@@ -44,7 +42,6 @@ async function setObjective() {
         body: JSON.stringify(data)
     });
 
-    console.log(request);
     if (request.status === 200) {
         await getObjective();
     }

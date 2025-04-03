@@ -67,7 +67,6 @@ async function saveMeal() {
         },
         body: JSON.stringify(meal)
     });
-    console.log(response.json());
 
     displayMeals();
     closeModal();
