@@ -28,8 +28,10 @@ export default class UserController {
     }
 
     async create(name: string, password: string) {
-        const user = await this.collection.insertOne({ name, password, token: null });
-        return new User(user.insertedId, name, password);
+        const data = new User(name, password);
+        const user = await this.collection.insertOne(data.toJson());
+        
+        return new User(name, password, user.insertedId);
     }
 
     async update(user: User) {

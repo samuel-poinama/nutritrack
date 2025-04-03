@@ -13,6 +13,7 @@ import { config } from 'dotenv';
 import Database from './utils/database';
 import UserController from './controller/user.controller';
 import UserDto from './dtos/user.dto';
+import ObjectiveDto from './dtos/objective.dto';
 
 config();
 const app = express();
@@ -108,6 +109,41 @@ app.post('/api/logout', async (req: Request, res: Response): Promise<any> => {
     const user = req.user;
     await userController.update(user!);
     return res.status(200).json({ message: 'Logged out successfully' });
+});
+
+
+app.get('/api/objective', async (req: Request, res: Response): Promise<any> => {
+    const user = req.user;
+
+    return res.status(200).json(user!.objective);
+});
+
+
+app.put('/api/objective', async (req: Request, res: Response): Promise<any> => {
+    const user = req.user;
+
+    if (!req.body) {
+        return res.status(400).json({ error: 'Request body is required' });
+    }
+
+    const objective = req.body as ObjectiveDto;
+
+    if (objective.calories) {
+        user!.objective.calories = objective.calories;
+    }
+
+    if (objective.fat) {
+        user!.objective.fat = objective.fat;
+    }
+
+    if (objective.protein) {
+        user!.objective.protein = objective.protein;
+    }
+
+    await userController.update(user!);
+
+    return res.status(200).json(user!.objective);
+
 });
 
 

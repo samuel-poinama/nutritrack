@@ -5,6 +5,14 @@ export interface UserDocument {
     name: string;
     password: string;
     token: null | string;
+    objective: Objective;
+}
+
+
+export interface Objective {
+    fat: number | null;
+    protein: number | null;
+    calories: number | null;
 }
 
 export default class User {
@@ -13,23 +21,26 @@ export default class User {
     private _name: string;
     private _password: string;
     private _token: null | string;
+    private _objective: Objective;
 
 
-    constructor(id: ObjectId, name: string, password: string, token?: null | string);
+    constructor(name: string, password: string, id?: ObjectId, objective?: Objective, token?: null | string);
 
     constructor(userDocument: UserDocument);
 
-    constructor(userDocumentOrId: UserDocument | ObjectId, name?: string, password?: string, token?: null | string) {
-        if (userDocumentOrId instanceof ObjectId) {
-            this.__id = userDocumentOrId;
-            this._name = name!;
+    constructor(userDocumentOrName: UserDocument | string, password?: string,id?: ObjectId, objective?: Objective, token?: null | string) {
+        if (typeof userDocumentOrName === 'string') {
+            this.__id = id!;
+            this._name = userDocumentOrName;
             this._password = password!;
             this._token = token === undefined ? null : token;
+            this._objective = objective || { fat: null, protein: null, calories: null };
         } else {
-            this.__id = userDocumentOrId._id;
-            this._name = userDocumentOrId.name;
-            this._password = userDocumentOrId.password;
-            this._token = userDocumentOrId.token;
+            this.__id = userDocumentOrName._id;
+            this._name = userDocumentOrName.name;
+            this._password = userDocumentOrName.password;
+            this._token = userDocumentOrName.token;
+            this._objective = userDocumentOrName.objective || { fat: null, protein: null, calories: null };
         }
     }
 
@@ -43,6 +54,14 @@ export default class User {
 
     get password(): string {
         return this._password;
+    }
+
+    get objective(): Objective {
+        return this._objective;
+    }
+
+    set objective(value: Objective) {
+        this._objective = value;
     }
 
     get token(): null | string {
@@ -59,6 +78,7 @@ export default class User {
             name: this.name,
             password: this.password,
             token: this.token,
+            objective: this._objective,
         };
     }
 }
