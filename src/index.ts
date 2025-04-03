@@ -24,11 +24,16 @@ app.use(express.json());
 
 app.post('/api/register', async (req: Request, res: Response): Promise<any> => {
     
-    const { name, password } = req.body;
+    if (!req.body) {
+        return res.status(400).json({ error: 'Request body is required' });
+    }
 
-    if (!name || !password) {
+    if (!req.body.name || !req.body.password) {
         return res.status(400).json({ error: 'Name and password are required' });
     }
+
+
+    const { name, password } = req.body;
 
    const found = await userController.getByName(name);
 
@@ -42,11 +47,15 @@ app.post('/api/register', async (req: Request, res: Response): Promise<any> => {
 
 
 app.post('/api/login', async (req: Request, res: Response): Promise<any> => {
-    const { name, password } = req.body;
+    if (!req.body) {
+        return res.status(400).json({ error: 'Request body is required' });
+    }
 
-    if (!name || !password) {
+    if (!req.body.name || !req.body.password) {
         return res.status(400).json({ error: 'Name and password are required' });
     }
+
+    const { name, password } = req.body;
 
     const user = await userController.getByName(name);
 
@@ -64,6 +73,27 @@ app.post('/api/login', async (req: Request, res: Response): Promise<any> => {
     await userController.update(user);
     return res.status(200).json({ token: user.token });
 });
+
+
+app.post('/api/logout', async (req: Request, res: Response): Promise<any> => {
+    const token = req.headers.authorization;
+
+    if (!token) {
+        return res.status(401).json({ error: 'Token is required' });
+    }
+
+    const user = await userController.getByToken(token);
+
+    if (!user) {
+        return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    user.token = null;
+    await userController.update(user);
+    return res.status(200).json({ message: 'Logged out successfully' });
+});
+
+
 
 
 app.listen(3000, () => {

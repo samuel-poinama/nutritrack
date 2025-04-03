@@ -1,5 +1,9 @@
 
+const token = localStorage.getItem("token");
 
+if (!token) {
+    window.location.href = "/login.html";
+}
 
 async function loadPage(page) {
     const pageUrl = `components/${page}.html`;

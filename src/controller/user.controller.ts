@@ -22,6 +22,11 @@ export default class UserController {
         return user ? new User(user) : null;
     }
 
+    async getByToken(token: string) {
+        const user = await this.collection.findOne({ token }) as UserDocument | null;
+        return user ? new User(user) : null;
+    }
+
     async create(name: string, password: string) {
         const user = await this.collection.insertOne({ name, password, token: null });
         return new User(user.insertedId, name, password);

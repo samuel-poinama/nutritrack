@@ -1,3 +1,7 @@
-const errorMessageDiv = document.getElementById('error-message');
-errorMessageDiv.textContent = 'Passwords do not match!';
-errorMessageDiv.classList.remove('hidden');
+
+
+function handleError(error) {
+    const errorMessageDiv = document.getElementById('error-message');
+    errorMessageDiv.textContent = error;
+    errorMessageDiv.classList.remove('hidden');
+} 
