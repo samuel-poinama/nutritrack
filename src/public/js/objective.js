@@ -3,7 +3,7 @@
 async function getObjective() {    
     const token = localStorage.getItem('token');
 
-    const request = await fetch('/api/objective', {
+    const request = await fetch('/api/goals', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -35,8 +35,8 @@ async function setObjective() {
 
     const data = { calories, fat, protein };
 
-    const request = await fetch('/api/objective', {
-        method: 'PUT',
+    const request = await fetch('/api/goals', {
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': token

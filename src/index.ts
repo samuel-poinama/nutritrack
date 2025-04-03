@@ -14,6 +14,7 @@ import Database from './utils/database';
 import UserController from './controller/user.controller';
 import UserDto from './dtos/user.dto';
 import ObjectiveDto from './dtos/objective.dto';
+import { MealDto as MealDto } from './dtos/meal.dto';
 
 config();
 const app = express();
@@ -112,14 +113,14 @@ app.post('/api/logout', async (req: Request, res: Response): Promise<any> => {
 });
 
 
-app.get('/api/objective', async (req: Request, res: Response): Promise<any> => {
+app.get('/api/goals', async (req: Request, res: Response): Promise<any> => {
     const user = req.user;
 
     return res.status(200).json(user!.objective);
 });
 
 
-app.put('/api/objective', async (req: Request, res: Response): Promise<any> => {
+app.post('/api/goals', async (req: Request, res: Response): Promise<any> => {
     const user = req.user;
 
     if (!req.body) {
@@ -145,6 +146,52 @@ app.put('/api/objective', async (req: Request, res: Response): Promise<any> => {
     return res.status(200).json(user!.objective);
 
 });
+
+
+
+app.get('/api/meals', async (req: Request, res: Response): Promise<any> => {
+    const user = req.user;
+
+    const meals = user!.meals.map((meal) => new MealDto(meal));
+    return res.status(200).json(meals);
+});
+
+app.post('/api/meals', async (req: Request, res: Response): Promise<any> => {
+    const user = req.user;
+
+    if (!req.body) {
+        return res.status(400).json({ error: 'Request body is required' });
+    }
+
+    const meal = req.body as MealDto;
+    if (!meal.name || !meal.calories || !meal.protein || !meal.fat) {
+        return res.status(400).json({ error: 'Name, calories, protein and fat are required' });
+    }
+
+    if (!meal.date) {
+        return res.status(400).json({ error: 'Date is required' });
+    }
+
+    const date = new Date(meal.date);
+
+    if (isNaN(date.getTime())) {
+        return res.status(400).json({ error: 'Invalid date format' });
+    }
+
+    user!.meals.push({
+        name: meal.name,
+        calories: meal.calories,
+        protein: meal.protein,
+        fat: meal.fat,
+        date: date
+    });
+
+    await userController.update(user!);
+    const meals = user!.meals.map((meal) => new MealDto(meal));
+    return res.status(201).json(meals);
+});
+
+
 
 
 
