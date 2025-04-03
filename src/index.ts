@@ -1,15 +1,18 @@
 import express from 'express';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { config } from 'dotenv';
+import Database from './utils/database';
 
-
+config();
 const app = express();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const database = new Database();
+const connect = database.connection();
+connect();
+
 const staticRoute = (route: string) => path.resolve(__dirname, 'public', route);
 
-app.use('/', express.static(staticRoute('./routes')));
+app.use('/', express.static(staticRoute('./routes'), { extensions: ['html'] }));
 app.use('/components', express.static(staticRoute('./components'), { extensions: ['html'] }));
 app.use('/js', express.static(staticRoute('./js'), { extensions: ['js'] }));
 
