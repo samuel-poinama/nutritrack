@@ -1,4 +1,13 @@
 import express, { Request, Response } from 'express';
+import User from './models/user.model';
+
+declare global {
+    namespace Express {
+        interface Request {
+            user?: User;
+        }
+    }
+}
 import path from 'path';
 import { config } from 'dotenv';
 import Database from './utils/database';
@@ -20,7 +29,27 @@ app.use('/', express.static(staticRoute('./routes'), { extensions: ['html'] }));
 app.use('/components', express.static(staticRoute('./components'), { extensions: ['html'] }));
 app.use('/js', express.static(staticRoute('./js'), { extensions: ['js'] }));
 
+
 app.use(express.json());
+app.use('/api/:route', async (req: Request, res: Response, next: Function): Promise<any> => {
+    const route = req.params.route;
+    if (route === 'register' || route === 'login') {
+        return next();
+    }
+
+    const token = req.headers.authorization;
+    if (!token) {
+        return res.status(401).json({ error: 'Token is required' });
+    }
+
+    const user = await userController.getByToken(token);
+    if (!user) {
+        return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    req.user = user;
+    next();
+});
 
 app.post('/api/register', async (req: Request, res: Response): Promise<any> => {
     
@@ -76,20 +105,8 @@ app.post('/api/login', async (req: Request, res: Response): Promise<any> => {
 
 
 app.post('/api/logout', async (req: Request, res: Response): Promise<any> => {
-    const token = req.headers.authorization;
-
-    if (!token) {
-        return res.status(401).json({ error: 'Token is required' });
-    }
-
-    const user = await userController.getByToken(token);
-
-    if (!user) {
-        return res.status(401).json({ error: 'Invalid token' });
-    }
-
-    user.token = null;
-    await userController.update(user);
+    const user = req.user;
+    await userController.update(user!);
     return res.status(200).json({ message: 'Logged out successfully' });
 });
 
