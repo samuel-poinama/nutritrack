@@ -113,6 +113,14 @@ app.post('/api/logout', async (req: Request, res: Response): Promise<any> => {
 });
 
 
+app.get('/api/me', async (req: Request, res: Response): Promise<any> => {
+    const user = req.user;
+    if (!user) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    return res.status(200).json(new UserDto(user));
+});
+
 app.get('/api/goals', async (req: Request, res: Response): Promise<any> => {
     const user = req.user;
 
@@ -192,6 +200,43 @@ app.post('/api/meals', async (req: Request, res: Response): Promise<any> => {
 });
 
 
+app.get('/api/recommendations', async (req: Request, res: Response): Promise<any> => {
+    const user = req.user;
+
+    if (!user) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const meals = user.meals.map((meal) => new MealDto(meal));
+    const objective = user.objective;
+
+    if (!objective || objective.calories === null || objective.protein === null || objective.fat === null) {
+        return res.status(400).json({ error: 'Objective data is incomplete or missing' });
+    }
+
+
+    // Filter meals based on the user's objective
+    const filteredMeals = meals.filter((meal) => {
+        return (
+            meal.calories > objective.calories! ||
+            meal.protein < objective.protein! ||
+            meal.fat > objective.fat!
+        );
+    });
+
+
+    // Sort meals based on the difference from the user's objective
+    const recommendations = filteredMeals.map((meal) => {
+        return {
+            name: meal.name,
+            caloriesDifference: objective.calories! - meal.calories,
+            proteinDifference: meal.protein - objective.protein!,
+            fatDifference: objective.fat! - meal.fat,
+        };
+    });
+
+    return res.status(200).json(recommendations);
+});
 
 
 
